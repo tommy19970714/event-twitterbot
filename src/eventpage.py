@@ -2,6 +2,7 @@ from connpass import Connpass
 from bs4 import BeautifulSoup
 import requests
 import urllib.parse
+from database import Database
 
 
 class Event():
@@ -59,6 +60,8 @@ def participation_url(event):
 
 if __name__ == "__main__":
 
+    db = Database()
+
     events = Event().from_ids([151291])
     for event in events:
         url = participation_url(event)
@@ -66,12 +69,21 @@ if __name__ == "__main__":
 
         print("-- organizers --")
         organizers = page.organizers()
-        print(organizers)
+        for i in organizers:
+            db.add_user(i)
+        print(db.read_users())
 
         print("-- presenters --")
         presenters = page.presenters()
-        print(presenters)
+        for i in presenters:
+            db.add_user(i)
+        print(db.read_users())
 
         print("-- attendees --")
         attendees = page.attendees()
         print(attendees)
+    
+    print("-- update flag --")
+    for i in range(10):
+        db.update_users(id=i, flag=1)
+    print(db.read_users())
