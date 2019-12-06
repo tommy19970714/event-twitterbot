@@ -1,9 +1,8 @@
-# -*- coding:utf-8 -*-
-
 from connpass import Connpass
 from bs4 import BeautifulSoup
 import requests
 import urllib.parse
+
 
 class Event():
     def __init__(self):
@@ -11,12 +10,14 @@ class Event():
         self.start = 0
 
     def from_date(self, date_array, count=1):
-        response = self.connpass.search(ymd=date_array, count=count, start=self.start)
+        response = self.connpass.search(
+            ymd=date_array, count=count, start=self.start)
         self.start += response["results_returned"]
         return response["events"]
 
     def from_ids(self, event_ids, count=1):
-        response = self.connpass.search(event_id=event_ids, count=count, start=self.start)
+        response = self.connpass.search(
+            event_id=event_ids, count=count, start=self.start)
         self.start += response["results_returned"]
         return response["events"]
 

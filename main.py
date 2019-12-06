@@ -1,7 +1,6 @@
-# -*- coding:utf-8 -*-
-
 import tweepy
-import eventpage
+import src.eventpage as eventpage
 
-if if __name__ == "__main__":
+if __name__ == "__main__":
+    pass
     
