@@ -29,12 +29,16 @@ class Database():
         [(1,)]
         """
         self.cursor.execute(
-            """INSERT OR IGNORE INTO {} (screen_name, flag) 
-            VALUES (?, ?)""".format(self.tablename), (screen_name, 0))
+            """INSERT OR IGNORE INTO {} 
+            (screen_name, flag) 
+            VALUES (?, ?)""".format(self.tablename), 
+            (screen_name, 0))
         self.connection.commit()
 
     def read_users(self):
-        self.cursor.execute('SELECT * FROM {}'.format(self.tablename))
+        self.cursor.execute(
+            """SELECT id, screen_name, friends, followers FROM {}
+            WHERE followed!=1 OR followed IS NULL """.format(self.tablename))
         return self.cursor.fetchall()
 
     def count_users(self):
