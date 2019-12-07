@@ -2,7 +2,7 @@ import sqlite3
 
 class Database():
     def __init__(self):
-        self.connection = sqlite3.connect("../twitterbot.sqlite")
+        self.connection = sqlite3.connect("./twitterbot.sqlite")
         self.connection.isolation_level = None
         self.cursor = self.connection.cursor()
         self.cursor.execute("DROP TABLE IF EXISTS twitter_users")
