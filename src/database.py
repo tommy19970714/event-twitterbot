@@ -22,11 +22,11 @@ class Database():
         >>> db.add_user('test_user1')
         """
         self.cursor.execute(
-            'INSERT OR IGNORE INTO twitter_users (screen_name, flag) VALUES (?, ?)', (screen_name, 0))
+            'INSERT OR IGNORE INTO {} (screen_name, flag) VALUES (?, ?)'.format(self.tablename), (screen_name, 0))
         self.connection.commit()
 
     def read_users(self):
-        self.cursor.execute('SELECT * FROM twitter_users')
+        self.cursor.execute('SELECT * FROM {}'.format(self.tablename))
         return self.cursor.fetchall()
 
     def count_users(self):
@@ -34,7 +34,7 @@ class Database():
 
     def update_users(self, id, flag):
         self.cursor.execute(
-            'UPDATE twitter_users SET flag = ? WHERE id = ?', (flag, id))
+            'UPDATE {} SET flag = ? WHERE id = ?'.format(self.tablename), (flag, id))
         self.connection.commit()
 
 
