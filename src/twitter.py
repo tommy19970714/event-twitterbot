@@ -1,8 +1,10 @@
-from database import Database
 import os
+import time
 import tweepy
 from dotenv import load_dotenv
 load_dotenv()
+if __name__ != "__main__":
+    from src.database import Database
 
 # Twitter CommentScreen secrets
 consumer_key = os.getenv("TW_CS_CONSUMERKEY")
@@ -19,7 +21,16 @@ def get_api(consumer_key, consumer_secret, access_token, access_token_secret):
     return api
 
 
+def limit_handled(cursor):
+    while True:
+        try:
+            yield cursor.next()
+        except tweepy.RateLimitError:
+            time.sleep(15 * 60)
+
+
 if __name__ == '__main__':
+    from database import Database
     api = get_api(consumer_key, consumer_secret,
                   access_token, access_token_secret)
     db = Database()
@@ -32,5 +43,7 @@ if __name__ == '__main__':
             # already collected data
             continue
         user = api.get_user(screen_name)
-        db.update_user(user.screen_name, 'friends', user.friends_count)
-        db.update_user(user.screen_name, 'followers', user.followers_count)
+        friends = user.friends_count
+        followers = user.followers_count
+        db.update_user(user.screen_name, 'friends', friends)
+        db.update_user(user.screen_name, 'followers', followers)

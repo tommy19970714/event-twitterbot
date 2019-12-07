@@ -2,7 +2,8 @@ from connpass import Connpass
 from bs4 import BeautifulSoup
 import requests
 import urllib.parse
-from database import Database
+if __name__ != "__main__":
+    from src.database import Database
 
 
 class Event():
@@ -49,16 +50,19 @@ class Page():
         tags = self.soup.select(".concerned_area > table > tbody")[
             1].select("td.social.text_center > a")
         return self.tag2url(tags)
-    
+
     def attendees(self):
-        tags = self.soup.select(".participation_table_area > table > tbody > tr > td.social.text_center > a")
+        tags = self.soup.select(
+            ".participation_table_area > table > tbody > tr > td.social.text_center > a")
         return self.tag2url(tags)
 
 
 def participation_url(event):
     return event["event_url"] + "participation"
 
+
 if __name__ == "__main__":
+    from database import Database
 
     db = Database()
 
@@ -82,7 +86,7 @@ if __name__ == "__main__":
         print("-- attendees --")
         attendees = page.attendees()
         print(attendees)
-    
+
     print("-- update flag --")
     for i in range(10):
         db.update_users(id=i, flag=1)
