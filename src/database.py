@@ -18,8 +18,10 @@ class Database():
 
     def add_user(self, screen_name):
         """
-        >>> db = Database()
+        >>> db = Database(tablename='test_twitter_users')
         >>> db.add_user('test_user1')
+        >>> db.count_users()
+        [(1,)]
         """
         self.cursor.execute(
             'INSERT OR IGNORE INTO {} (screen_name, flag) VALUES (?, ?)'.format(self.tablename), (screen_name, 0))
@@ -31,6 +33,7 @@ class Database():
 
     def count_users(self):
         self.cursor.execute('SELECT count(*) FROM {}'.format(self.tablename))
+        return self.cursor.fetchall()
 
     def update_users(self, id, flag):
         self.cursor.execute(
