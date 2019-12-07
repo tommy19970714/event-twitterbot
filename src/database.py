@@ -2,14 +2,15 @@ import sqlite3
 
 
 class Database():
-    def __init__(self, filepath='./twitterbot.sqlite', tablename='twitter_users'):
+    def __init__(self, filepath='./twitterbot.sqlite', tablename='twitter_users', drop_anyway=False):
         self.filepath = filepath
         self.tablename = tablename
 
         self.connection = sqlite3.connect(self.filepath)
         self.connection.isolation_level = None
         self.cursor = self.connection.cursor()
-        self.cursor.execute("DROP TABLE IF EXISTS {}".format(self.tablename))
+        if drop_anyway:
+            self.cursor.execute("DROP TABLE IF EXISTS {}".format(self.tablename))
         self.cursor.execute(
             """CREATE TABLE IF NOT EXISTS {} (
                 id INTEGER PRIMARY KEY AUTOINCREMENT, 
@@ -48,6 +49,12 @@ class Database():
     def update_users(self, id, flag):
         self.cursor.execute(
             'UPDATE {} SET flag = ? WHERE id = ?'.format(self.tablename), (flag, id))
+        self.connection.commit()
+
+    def update_user(self, screen_name, key, value):
+        self.cursor.execute(
+            """UPDATE {} SET {} = ? WHERE screen_name = ?""".format(self.tablename, key), 
+            (value, screen_name))
         self.connection.commit()
 
 
