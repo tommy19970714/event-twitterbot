@@ -13,7 +13,12 @@ class Database():
         self.cursor.execute(
             """CREATE TABLE IF NOT EXISTS {} (
                 id INTEGER PRIMARY KEY AUTOINCREMENT, 
-                screen_name VARCHAR(64), 
+                screen_name VARCHAR(64) UNIQUE, 
+                friends INTEGER,
+                followers INTEGER,
+                followed BOOL,
+                followed_at TEXT,
+                unfollowed BOOL,
                 flag BOOL)""".format(self.tablename))
 
     def add_user(self, screen_name):
@@ -24,7 +29,8 @@ class Database():
         [(1,)]
         """
         self.cursor.execute(
-            'INSERT OR IGNORE INTO {} (screen_name, flag) VALUES (?, ?)'.format(self.tablename), (screen_name, 0))
+            """INSERT OR IGNORE INTO {} (screen_name, flag) 
+            VALUES (?, ?)""".format(self.tablename), (screen_name, 0))
         self.connection.commit()
 
     def read_users(self):
