@@ -1,3 +1,4 @@
+from database import Database
 import os
 import tweepy
 from dotenv import load_dotenv
@@ -21,7 +22,15 @@ def get_api(consumer_key, consumer_secret, access_token, access_token_secret):
 if __name__ == '__main__':
     api = get_api(consumer_key, consumer_secret,
                   access_token, access_token_secret)
+    db = Database()
 
-    public_tweets = api.home_timeline()
-    for tweet in public_tweets:
-        print(tweet.text)
+    for row in db.read_users():
+        screen_name = row[1]
+        friends = row[2]
+        followers = row[3]
+        if friends or followers:
+            # already collected data
+            continue
+        user = api.get_user(screen_name)
+        db.update_user(user.screen_name, 'friends', user.friends_count)
+        db.update_user(user.screen_name, 'followers', user.followers_count)
