@@ -70,10 +70,12 @@ def follow_job(api, db, follow_lim_daily=20, follow_lim_once=5):
         for u in users:
             user = api.get_user(u.screen_name)
             if user.id in followers:
+                update_user(user.screen_name, "reciprocal", True)
+            else:
                 user.unfollow()
                 update_user(user.screen_name, "unfollowed", True)
                 update_user(user.screen_name, "unfollowed_at", datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"))
-                time.sleep(10)
+            time.sleep(10)
     except tweepy.RateLimitError:
         time.sleep(15 * 60)
     except Exception as e:
