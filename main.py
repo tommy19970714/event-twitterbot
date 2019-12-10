@@ -50,7 +50,27 @@ def follow_job(api, db, follow_lim_daily=20, follow_lim_once=5):
         for u in users:
             user = api.get_user(u.screen_name)
             user.follow()
+            ## update statement
             time.sleep(10)
+    except tweepy.RateLimitError:
+        time.sleep(15 * 60)
+    except Exception as e:
+        raise e
+
+
+ def unfollow_job(api, db, unfollow_lim_daily=20, unfollow_lim_once=5):
+    today_count = db.unfollow_count_today()
+    if today_count > unfollow_lim_daily:
+        return
+    users = db.read_unfollow_users(count=unfollow_lim_once)
+    followers = api.followers_ids()
+    try:
+        for u in users:
+            user = api.get_user(u.screen_name)
+            if user.id in followers:
+                user.unfollow()
+                ## update statement
+                time.sleep(10)
     except tweepy.RateLimitError:
         time.sleep(15 * 60)
     except Exception as e:
