@@ -87,7 +87,10 @@ if __name__ == "__main__":
     db = Database()
 
     schedule.every(2).hours.do(follow_job, api=api, db=db,
-                               follow_lim_daily=100, follow_lim_once=5)
+                               follow_lim_daily=20, follow_lim_once=5)
+    
+    schedule.every(4).hours.do(unfollow_job, api=api, db=db,
+                               unfollow_lim_daily=20, unfollow_lim_once=5)
 
     schedule.every().day.at("10:00").do(crawling_job, api=api, db=db))
 
