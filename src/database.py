@@ -1,5 +1,5 @@
 import sqlite3
-
+from datetime import datetime
 
 class Database():
     def __init__(self, filepath='./twitterbot.sqlite', tablename='twitter_users', drop_anyway=False):
@@ -68,11 +68,11 @@ class Database():
     def follow_count_today(self):
         """
         >>> db = Database(tablename='test_twitter_users', drop_anyway=True)
-        >>> db.add_user('u1', 0, 0, False, '2019-12-07 09:23:13', False, '', '')
-        >>> db.add_user('u2', 9, 1, False, '2019-12-08 09:23:13', False, '', '')
-        >>> db.add_user('u3', 3, 1, False, '2019-12-09 09:23:13', False, '', '')
+        >>> db.add_user('u1', 0, 0, True, '2019-12-07 09:23:13', False, '', '')
+        >>> db.add_user('u2', 9, 1, True, '2019-12-09 09:23:13', False, '', '')
+        >>> db.add_user('u3', 3, 1, True, datetime.now().strftime("%Y-%m-%d %H:%M:%S"), False, '', '')
         >>> db.follow_count_today()
-        [(0,)]
+        [(1,)]
         """
         self.cursor.execute(
             """
@@ -103,11 +103,6 @@ class Database():
     def count_users(self):
         self.cursor.execute('SELECT COUNT(*) FROM {}'.format(self.tablename))
         return self.cursor.fetchall()
-
-    def update_users(self, id, flag):
-        self.cursor.execute(
-            'UPDATE {} SET flag = ? WHERE id = ?'.format(self.tablename), (flag, id))
-        self.connection.commit()
 
     def update_user(self, screen_name, key, value):
         self.cursor.execute(
