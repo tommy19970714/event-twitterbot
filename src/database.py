@@ -19,31 +19,74 @@ class Database():
                 followers INTEGER,
                 followed BOOL,
                 followed_at TEXT,
-                unfollowed BOOL,
-                flag BOOL)""".format(self.tablename))
+                unfollowed_at TEXT,
+                update_at TEXT)""".format(self.tablename))
 
-    def add_user(self, screen_name):
+    def add_user(self, screen_name, friends, followers, followed, followed_at, unfollowed_at, update_at):
         """
-        >>> db = Database(tablename='test_twitter_users')
-        >>> db.add_user('test_user1')
+        >>> db = Database(tablename='test_twitter_users', drop_anyway=True)
+        >>> db.add_user('test_user1', 0, 0, False,'', '', '')
         >>> db.count_users()
         [(1,)]
         """
         self.cursor.execute(
             """INSERT OR IGNORE INTO {} 
-            (screen_name, flag) 
-            VALUES (?, ?)""".format(self.tablename), 
-            (screen_name, 0))
+            (screen_name, friends, followers, followed, followed_at, unfollowed_at, update_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)""".format(self.tablename), 
+            (screen_name, friends, followers, followed, followed_at, unfollowed_at, update_at))
         self.connection.commit()
 
-    def read_users(self):
+    def read_users(self, count=10):
+        """
+        >>> db = Database(tablename='test_twitter_users', drop_anyway=True)
+        >>> db.add_user('u1', 0, 0, False, '', '', '')
+        >>> db.add_user('u2', 9, 1, False, '', '', '')
+        >>> db.add_user('u3', 3, 1, False, '', '', '')
+        >>> db.read_users()
+        [(2, u'u2', 9, 1), (3, u'u3', 3, 1), (1, u'u1', 0, 0)]
+        """
         self.cursor.execute(
             """SELECT id, screen_name, friends, followers FROM {}
-            WHERE followed!=1 OR followed IS NULL """.format(self.tablename))
+            WHERE followed!=1 OR followed IS NULL ORDER BY friends / (followers + 1) DESC LIMIT {}""".format(self.tablename, count))
         return self.cursor.fetchall()
 
+    def follow_count_today(self):
+        """
+        >>> db = Database(tablename='test_twitter_users', drop_anyway=True)
+        >>> db.add_user('u1', 0, 0, False, '2019-12-07 09:23:13', '', '')
+        >>> db.add_user('u2', 9, 1, False, '2019-12-08 09:23:13', '', '')
+        >>> db.add_user('u3', 3, 1, False, '2019-12-09 09:23:13', '', '')
+        >>> db.follow_count_today()
+        [(0,)]
+        """
+        self.cursor.execute(
+            """
+            SELECT count(followed_at)
+            FROM {} 
+            WHERE DATE(followed_at) = DATE('now')
+            """.format(self.tablename))
+        return self.cursor.fetchall()
+
+    def unfollow_count_today(self):
+        """
+        >>> db = Database(tablename='test_twitter_users', drop_anyway=True)
+        >>> db.add_user('u1', 0, 0, False, '', '2019-12-07 09:23:13', '')
+        >>> db.add_user('u2', 9, 1, False, '', '2019-12-08 09:23:13', '')
+        >>> db.add_user('u3', 3, 1, False, '', '2019-12-09 09:23:13', '')
+        >>> db.unfollow_count_today()
+        [(0,)]
+        """
+        self.cursor.execute(
+            """
+            SELECT count(unfollowed_at)
+            FROM {} 
+            WHERE DATE(unfollowed_at) = DATE('now')
+            """.format(self.tablename))
+        return self.cursor.fetchall()
+
+
     def count_users(self):
-        self.cursor.execute('SELECT count(*) FROM {}'.format(self.tablename))
+        self.cursor.execute('SELECT COUNT(*) FROM {}'.format(self.tablename))
         return self.cursor.fetchall()
 
     def update_users(self, id, flag):
