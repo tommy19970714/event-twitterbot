@@ -70,7 +70,7 @@ class Database():
         >>> db = Database(tablename='test_twitter_users', drop_anyway=True)
         >>> db.add_user('u1', 0, 0, True, '2019-12-07 09:23:13', False, '', '')
         >>> db.add_user('u2', 9, 1, True, '2019-12-09 09:23:13', False, '', '')
-        >>> db.add_user('u3', 3, 1, True, datetime.now().strftime("%Y-%m-%d %H:%M:%S"), False, '', '')
+        >>> db.add_user('u3', 3, 1, True, datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"), False, '', '')
         >>> db.follow_count_today()
         [(1,)]
         """

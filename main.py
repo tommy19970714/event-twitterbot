@@ -52,7 +52,7 @@ def follow_job(api, db, follow_lim_daily=20, follow_lim_once=5):
             user.follow()
             update_user(user.screen_name, "followed", True)
             update_user(user.screen_name, "followed_at",
-                        datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                        datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"))
             time.sleep(10)
     except tweepy.RateLimitError:
         time.sleep(15 * 60)
@@ -72,7 +72,7 @@ def follow_job(api, db, follow_lim_daily=20, follow_lim_once=5):
             if user.id in followers:
                 user.unfollow()
                 update_user(user.screen_name, "unfollowed", True)
-                update_user(user.screen_name, "unfollowed_at", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                update_user(user.screen_name, "unfollowed_at", datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"))
                 time.sleep(10)
     except tweepy.RateLimitError:
         time.sleep(15 * 60)
